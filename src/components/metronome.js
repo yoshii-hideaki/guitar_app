@@ -20,15 +20,19 @@ function Metronome() {
   return (
     <div>
       <h2>メトロノーム</h2>
-      <button onClick={() => setBpm(bpm - 10)}>-10 BPM</button>
+      <button onClick={() => setBpm(bpm + 1)} style={{marginRight: "5px"}}>+1</button>
+      <button onClick={() => setBpm(bpm + 10)} style={{marginBottom: "5px", marginRight: "40px"}}>+10</button>
+      <br />
       <input
         type="number"
         value={bpm}
         onChange={(e) => setBpm(Number(e.target.value))}
         style={{ fontSize: "20px", width: "80px", textAlign: "center", marginLeft: "10px" }}
       />
-      <button onClick={() => setBpm(bpm + 10)}>+10 BPM</button>
       <span style={{ fontSize: "20px", marginLeft: "10px" }}>BPM</span>
+      <br />
+      <button onClick={() => setBpm(bpm - 1)} style={{marginRight: "5px"}}>-1</button>
+      <button onClick={() => setBpm(bpm - 10)} style={{marginTop: "5px", marginRight: "40px"}}>-10</button>
       <br />
       <button onClick={() => setIsPlaying(!isPlaying)} style={{ fontSize: "20px", marginTop: "10px" }}>
         {isPlaying ? "停止" : "再生"}
