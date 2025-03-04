@@ -41,8 +41,8 @@ function ChordDisplay() {
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>ランダムギターコード</h2>
-      <h1>現在のコード: {chord}</h1>
+      <h1>ランダムギターコード</h1>
+      <h2>現在のコード: {chord}</h2>
       <h3>次のコード: {nextChord}</h3>
       <button onClick={() => setIsPlaying(!isPlaying)}>
         {isPlaying ? "停止" : "自動更新"}
