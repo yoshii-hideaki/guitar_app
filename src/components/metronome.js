@@ -1,23 +1,63 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useBpm } from "./BpmContext"
 
-const clickSound = new Audio("/click.wav")
-
 function Metronome() {
-  const { bpm, setBpm } = useBpm() // Context から BPM を取得
+  const { bpm, setBpm } = useBpm()
   const [isPlaying, setIsPlaying] = useState(false)
+  const audioContextRef = useRef(null)
+  const audioBufferRef = useRef(null)
 
+  // コンポーネントマウント時に AudioContext の作成とクリック音の読み込みを行う
+  useEffect(() => {
+    const AudioContext = window.AudioContext || window.webkitAudioContext
+    audioContextRef.current = new AudioContext()
+
+    fetch("/click.wav")
+      .then((response) => response.arrayBuffer())
+      .then((arrayBuffer) =>
+        audioContextRef.current.decodeAudioData(arrayBuffer)
+      )
+      .then((decodedData) => {
+        audioBufferRef.current = decodedData
+      })
+      .catch((error) =>
+        console.error("クリック音の読み込みに失敗しました:", error)
+      )
+
+    // アンマウント時に AudioContext を閉じる
+    return () => {
+      if (audioContextRef.current) {
+        audioContextRef.current.close()
+      }
+    }
+  }, [])
+
+  // クリック音を再生する関数（Web Audio API を利用）
+  const playClick = () => {
+    if (!audioBufferRef.current || !audioContextRef.current) return
+    const source = audioContextRef.current.createBufferSource()
+    source.buffer = audioBufferRef.current
+    source.connect(audioContextRef.current.destination)
+    source.start()
+  }
+
+  // BPM や再生状態に合わせて再生のインターバルを設定する
   useEffect(() => {
     if (!isPlaying) return
 
-    const interval = setInterval(
-      () => {
-        clickSound.play()
-      },
-      (60 / bpm) * 1000,
-    )
+    // スマホなどで AudioContext が "suspended" 状態の場合、ユーザー操作で再開する
+    if (
+      audioContextRef.current &&
+      audioContextRef.current.state === "suspended"
+    ) {
+      audioContextRef.current.resume()
+    }
+
+    const interval = setInterval(() => {
+      playClick()
+    }, (60 / bpm) * 1000)
 
     return () => clearInterval(interval)
   }, [bpm, isPlaying])
@@ -138,7 +178,16 @@ function Metronome() {
         </div>
 
         <div style={bpmDisplayStyle}>
-          <input type="number" value={bpm} onChange={(e) => setBpm(Number(e.target.value))} style={bpmInputStyle} />
+          <input 
+            type="number" 
+            value={bpm} 
+            onChange={(e) => {
+                const newBpm = Number(e.target.value);
+                setBpm(newBpm > 0 ? newBpm : 1);
+            }} 
+            style={bpmInputStyle} 
+          />
+
           <span style={bpmLabelStyle}>BPM</span>
         </div>
 
