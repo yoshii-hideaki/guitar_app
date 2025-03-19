@@ -7,10 +7,9 @@ const allChords = ["C", "G", "D", "Am", "Em", "F", "Bm"]
 const numBeatsPerMeasure = 4
 
 function ChordDisplay() {
-  const { bpm } = useBpm()
+  const { bpm, isPlaying, setIsPlaying } = useBpm()
   const [chord, setChord] = useState("C")
   const [nextChord, setNextChord] = useState("G")
-  const [isPlaying, setIsPlaying] = useState(false)
   const [selectedChords, setSelectedChords] = useState([...allChords])
 
   // getRandomChord を useCallback でメモ化

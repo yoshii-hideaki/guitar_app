@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { useBpm } from "./BpmContext"
 
 function Metronome() {
-  const { bpm, setBpm } = useBpm()
-  const [isPlaying, setIsPlaying] = useState(false)
+  const { bpm, setBpm, isPlaying, setIsPlaying } = useBpm()
   const audioContextRef = useRef(null)
   const audioBufferRef = useRef(null)
 
@@ -102,7 +101,7 @@ function Metronome() {
     width: "120px",
   }
 
-  // BPM調整部分のスタイル改良
+  // BPM調整部分
   const bpmControlsStyle = {
     display: "flex",
     justifyContent: "center",

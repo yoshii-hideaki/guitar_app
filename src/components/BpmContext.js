@@ -1,18 +1,20 @@
-import React, { createContext, useState, useContext } from "react";
+"use client"
 
-// Context の作成
-const BpmContext = createContext();
+import { createContext, useContext, useState } from "react"
 
-// Provider コンポーネント
-export const BpmProvider = ({ children }) => {
-  const [bpm, setBpm] = useState(120); // BPMの状態管理
+const BpmContext = createContext()
+
+export function BpmProvider({ children }) {
+  const [bpm, setBpm] = useState(120)
+  const [isPlaying, setIsPlaying] = useState(false)
 
   return (
-    <BpmContext.Provider value={{ bpm, setBpm }}>
+    <BpmContext.Provider value={{ bpm, setBpm, isPlaying, setIsPlaying }}>
       {children}
     </BpmContext.Provider>
-  );
-};
+  )
+}
 
-// BPM の値を使うカスタムフック
-export const useBpm = () => useContext(BpmContext);
+export function useBpm() {
+  return useContext(BpmContext)
+}
