@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useBpm } from "./BpmContext"
 
 const allChords = ["C", "G", "D", "Am", "Em", "F", "Bm"]
@@ -11,12 +11,34 @@ function ChordDisplay() {
   const [chord, setChord] = useState("C")
   const [nextChord, setNextChord] = useState("G")
   const [selectedChords, setSelectedChords] = useState([...allChords])
-
-  // getRandomChord を useCallback でメモ化
+  const indexRef = useRef(0)
+  const lastChordRef = useRef(null)
+  const [mode, setMode] = useState("random") // "random" | "noRepeat" | "sequential"
+  
   const getRandomChord = useCallback(() => {
     if (selectedChords.length === 0) return "N/A"
-    return selectedChords[Math.floor(Math.random() * selectedChords.length)]
-  }, [selectedChords])
+  
+    let chord = "N/A"
+  
+    switch (mode) {
+      case "random":
+        chord = selectedChords[Math.floor(Math.random() * selectedChords.length)]
+        break
+      case "noRepeat":
+        do {
+          chord = selectedChords[Math.floor(Math.random() * selectedChords.length)]
+        } while (chord === lastChordRef.current && selectedChords.length > 1)
+        break
+      case "sequential":
+        chord = selectedChords[indexRef.current % selectedChords.length]
+        indexRef.current = indexRef.current + 1
+        break
+    }
+  
+    lastChordRef.current = chord
+    return chord
+  }, [selectedChords, mode])
+  
 
   useEffect(() => {
     if (!isPlaying) return
@@ -148,6 +170,42 @@ function ChordDisplay() {
           </label>
         ))}
       </div>
+      <div style={{ marginTop: "30px" }}>
+      <h3 style={{ fontWeight: "300", marginBottom: "10px" }}>コードの出し方</h3>
+      <label>
+        <input
+          type="radio"
+          name="mode"
+          value="random"
+          checked={mode === "random"}
+          onChange={() => setMode("random")}
+          style={checkboxStyle}
+        />
+        完全ランダム
+      </label>
+      <label style={{ marginLeft: "20px" }}>
+        <input
+          type="radio"
+          name="mode"
+          value="noRepeat"
+          checked={mode === "noRepeat"}
+          onChange={() => setMode("noRepeat")}
+          style={checkboxStyle}
+        />
+        前回と同じは避ける
+      </label>
+      <label style={{ marginLeft: "20px" }}>
+        <input
+          type="radio"
+          name="mode"
+          value="sequential"
+          checked={mode === "sequential"}
+          onChange={() => setMode("sequential")}
+          style={checkboxStyle}
+        />
+        順番に表示
+      </label>
+    </div>
     </div>
   )
 }
