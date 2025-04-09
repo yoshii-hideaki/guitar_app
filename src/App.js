@@ -1,9 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import { useState } from "react"
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
 import Metronome from "./components/metronome"
 import ChordDisplay from "./components/chord_display"
 import ChordGallery from "./components/ChordGallery"
 import { BpmProvider } from "./components/BpmContext"
-import { Link } from "react-router-dom"
+import "./App.css"
 
 function Home() {
   return (
@@ -15,9 +16,30 @@ function Home() {
 }
 
 function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   return (
     <BpmProvider>
       <Router>
+        <button
+          className="sidebar-toggle"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          ☰
+        </button>
+
+        <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+          <Link to="/" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            ランダムコード
+          </Link>
+          <Link to="/metronome" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            メトロノーム
+          </Link>
+          <Link to="/chords" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            コード一覧
+          </Link>
+        </div>
+
         <div
           style={{
             backgroundColor: "#121212",
@@ -25,6 +47,8 @@ function App() {
             padding: "40px 20px",
             fontFamily: "'Helvetica Neue', Arial, sans-serif",
             color: "#f5f5f5",
+            marginLeft: sidebarOpen ? "250px" : "0",
+            transition: "margin-left 0.3s ease",
           }}
         >
           <h1
@@ -40,18 +64,6 @@ function App() {
           >
             ギター練習アプリ
           </h1>
-
-          <nav style={{ textAlign: "center", marginBottom: "30px" }}>
-            <Link to="/" style={{ marginRight: "20px", color: "#90caf9" }}>
-              ランダムコード
-            </Link>
-            <Link to="/metronome" style={{ marginRight: "20px", color: "#90caf9" }}>
-              メトロノーム
-            </Link>
-            <Link to="/chords" style={{ color: "#90caf9" }}>
-              コード一覧
-            </Link>
-          </nav>
 
           <Routes>
             <Route path="/" element={<Home />} />

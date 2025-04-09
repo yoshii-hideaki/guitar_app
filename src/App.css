@@ -1,0 +1,66 @@
+.navbar {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .navbar-link {
+    margin: 0 10px;
+    padding: 10px 20px;
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+  
+  .navbar-link:hover {
+    background-color: #ffffff;
+    color: #1e1e1e;
+  }
+  
+  /* サイドバー部分 */
+  
+  .sidebar-toggle {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 28px;
+    color: #ffffff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #1e1e1e;
+    padding-top: 60px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .sidebar-link {
+    display: block;
+    padding: 15px 20px;
+    color: #ffffff;
+    text-decoration: none;
+    border-bottom: 1px solid #333;
+    transition: background 0.3s;
+  }
+  
+  .sidebar-link:hover {
+    background-color: #333;
+  }
+  
