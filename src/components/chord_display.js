@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useBpm } from "./BpmContext"
 
-const allChords = ["C", "G", "D", "Am", "Em", "F", "Bm"]
+const allChords = ["C", "G", "D", "Am", "Em", "F", "Bm", "Dm"]
 const numBeatsPerMeasure = 4
 
 function ChordDisplay() {

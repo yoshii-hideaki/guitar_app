@@ -8,12 +8,13 @@ import "./App.css"
 
 function Home() {
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
       <ChordDisplay />
       <Metronome />
-    </>
+    </div>
   )
 }
+
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -47,7 +48,6 @@ function App() {
             padding: "40px 20px",
             fontFamily: "'Helvetica Neue', Arial, sans-serif",
             color: "#f5f5f5",
-            marginLeft: sidebarOpen ? "250px" : "0",
             transition: "margin-left 0.3s ease",
           }}
         >

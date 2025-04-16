@@ -6,6 +6,7 @@ const chords = [
   { name: "Em", image: "Em.png" },
   { name: "F", image: "F.png" },
   { name: "Bm", image: "Bm.png" },
+  { name: "Dm", image: "Dm.png" },
 ]
 
 export default function ChordGallery() {
