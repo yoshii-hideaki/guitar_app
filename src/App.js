@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
 import Metronome from "./components/metronome"
 import ChordDisplay from "./components/chord_display"
@@ -15,9 +15,26 @@ function Home() {
   )
 }
 
-
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const sidebarRef = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !event.target.classList.contains("sidebar-toggle")
+      ) {
+        setSidebarOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
   return (
     <BpmProvider>
@@ -29,7 +46,7 @@ function App() {
           ☰
         </button>
 
-        <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+        <div ref={sidebarRef} className={`sidebar ${sidebarOpen ? "open" : ""}`}>
           <Link to="/" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
             ランダムコード
           </Link>
