@@ -4,6 +4,7 @@ import Metronome from "./components/metronome"
 import ChordDisplay from "./components/chord_display"
 import ChordGallery from "./components/ChordGallery"
 import { BpmProvider } from "./components/BpmContext"
+import Tuner from "./components/Tuner"
 import "./App.css"
 
 function Home() {
@@ -56,6 +57,9 @@ function App() {
           <Link to="/chords" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
             コード一覧
           </Link>
+          <Link to="/tuner" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            チューナー
+          </Link>
         </div>
 
         <div
@@ -86,6 +90,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/metronome" element={<Metronome />} />
             <Route path="/chords" element={<ChordGallery />} />
+            <Route path="/tuner" element={<Tuner />} />
           </Routes>
         </div>
       </Router>
