@@ -12,6 +12,7 @@ const stringNotes = {
 function Tuner() {
   const [frequency, setFrequency] = useState(null)
   const [selectedString, setSelectedString] = useState(1)
+  const [tuningStatus, setTuningStatus] = useState("waiting") // "in-tune", "close", "out-of-tune", "waiting"
   const canvasRef = useRef(null)
   const diffRef = useRef(0)
 
@@ -22,30 +23,48 @@ function Tuner() {
     let dataArray
 
     const init = async () => {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)()
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      source = audioContext.createMediaStreamSource(stream)
-      analyser = audioContext.createAnalyser()
-      analyser.fftSize = 2048
-      dataArray = new Float32Array(analyser.fftSize)
-      source.connect(analyser)
+      try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)()
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        source = audioContext.createMediaStreamSource(stream)
+        analyser = audioContext.createAnalyser()
+        analyser.fftSize = 2048
+        dataArray = new Float32Array(analyser.fftSize)
+        source.connect(analyser)
 
-      const update = () => {
-        analyser.getFloatTimeDomainData(dataArray)
-        const freq = autoCorrelate(dataArray, audioContext.sampleRate)
-        const expected = stringNotes[selectedString]
-        if (freq) {
-          setFrequency(freq.toFixed(1))
-          diffRef.current = freq - expected.freq
-        } else {
-          setFrequency(null)
-          diffRef.current = 0
+        const update = () => {
+          analyser.getFloatTimeDomainData(dataArray)
+          const freq = autoCorrelate(dataArray, audioContext.sampleRate)
+          const expected = stringNotes[selectedString]
+          
+          if (freq) {
+            setFrequency(freq.toFixed(1))
+            diffRef.current = freq - expected.freq
+            
+            // Set tuning status based on difference
+            const absDiff = Math.abs(diffRef.current)
+            if (absDiff < 1) {
+              setTuningStatus("in-tune")
+            } else if (absDiff < 5) {
+              setTuningStatus("close")
+            } else {
+              setTuningStatus("out-of-tune")
+            }
+          } else {
+            setFrequency(null)
+            diffRef.current = 0
+            setTuningStatus("waiting")
+          }
+          
+          drawNeedle(expected.note)
+          requestAnimationFrame(update)
         }
-        drawNeedle(expected.note)
-        requestAnimationFrame(update)
-      }
 
-      update()
+        update()
+      } catch (err) {
+        console.error("マイクアクセスに失敗しました:", err)
+        // マイクへのアクセスが失敗した場合のフォールバック表示
+      }
     }
 
     init()
@@ -62,17 +81,60 @@ function Tuner() {
     const h = canvas.height
     ctx.clearRect(0, 0, w, h)
 
-    ctx.fillStyle = "white"
-    ctx.font = "28px sans-serif"
+    // Draw note name with shadow for better visibility
+    ctx.fillStyle = "#ffffff"
+    ctx.font = "bold 32px sans-serif"
     ctx.textAlign = "center"
-    ctx.fillText(note, w / 2, 40)
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)"
+    ctx.shadowBlur = 5
+    ctx.shadowOffsetX = 2
+    ctx.shadowOffsetY = 2
+    
+    // Position note at the very top of the canvas
+    ctx.fillText(note, w / 2, 35)
+    
+    // Reset shadow for other drawings
+    ctx.shadowColor = "transparent"
+    ctx.shadowBlur = 0
+    ctx.shadowOffsetX = 0
+    ctx.shadowOffsetY = 0
 
+    // Draw gauge background
     ctx.beginPath()
     ctx.arc(w / 2, h - 10, w / 2 - 20, Math.PI, 2 * Math.PI)
-    ctx.strokeStyle = "#ccc"
-    ctx.lineWidth = 4
+    ctx.strokeStyle = "#444"
+    ctx.lineWidth = 8
     ctx.stroke()
 
+    // Draw color zones on the gauge
+    const drawColorZone = (startAngle, endAngle, color) => {
+      ctx.beginPath()
+      ctx.arc(w / 2, h - 10, w / 2 - 20, startAngle, endAngle)
+      ctx.strokeStyle = color
+      ctx.lineWidth = 8
+      ctx.stroke()
+    }
+
+    // Red zone (left)
+    drawColorZone(Math.PI, Math.PI + Math.PI / 4, "#b71c1c")
+    // Yellow zone (left)
+    drawColorZone(Math.PI + Math.PI / 4, Math.PI + Math.PI / 2 - 0.1, "#f57f17")
+    // Green zone (middle)
+    drawColorZone(Math.PI + Math.PI / 2 - 0.1, Math.PI + Math.PI / 2 + 0.1, "#1b5e20")
+    // Yellow zone (right)
+    drawColorZone(Math.PI + Math.PI / 2 + 0.1, Math.PI + 3 * Math.PI / 4, "#f57f17")
+    // Red zone (right)
+    drawColorZone(Math.PI + 3 * Math.PI / 4, 2 * Math.PI, "#b71c1c")
+
+    // Draw centering lines
+    ctx.beginPath()
+    ctx.moveTo(w / 2, h - 10)
+    ctx.lineTo(w / 2, h - 10 - (w / 2 - 20) * 0.2)
+    ctx.strokeStyle = "#fff"
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // Calculate and clamp needle position
     const maxDiff = 50
     const clamped = Math.max(-maxDiff, Math.min(maxDiff, diffRef.current))
     const angle = (clamped / maxDiff) * (Math.PI / 2)
@@ -83,12 +145,44 @@ function Tuner() {
     const x = centerX + radius * Math.sin(angle)
     const y = centerY - radius * Math.cos(angle)
 
+    // Draw needle
     ctx.beginPath()
     ctx.moveTo(centerX, centerY)
     ctx.lineTo(x, y)
-    ctx.strokeStyle = Math.abs(diffRef.current) < 1 ? "lime" : "red"
-    ctx.lineWidth = 3
+    ctx.strokeStyle = getStatusColor(tuningStatus)
+    ctx.lineWidth = 4
     ctx.stroke()
+
+    // Draw needle tip as a circle
+    ctx.beginPath()
+    ctx.arc(x, y, 8, 0, 2 * Math.PI)
+    ctx.fillStyle = getStatusColor(tuningStatus)
+    ctx.fill()
+  }
+
+  const getStatusColor = (status) => {
+    switch(status) {
+      case "in-tune": return "#1b5e20";
+      case "close": return "#f57f17";
+      case "out-of-tune": return "#b71c1c";
+      default: return "#777";
+    }
+  }
+
+  const getStatusText = () => {
+    switch(tuningStatus) {
+      case "in-tune": return "チューニング完了！";
+      case "close": return "もう少し...";
+      case "out-of-tune": return "チューニングが必要です";
+      default: return "音を検出中...";
+    }
+  }
+
+  // Calculate the difference to show as an instruction
+  const getTuningDirection = () => {
+    if (!frequency || tuningStatus === "in-tune" || tuningStatus === "waiting") return "";
+    
+    return diffRef.current > 0 ? "緩めてください" : "締めてください";
   }
 
   return (
@@ -96,32 +190,52 @@ function Tuner() {
       <h2 className="tuner-title">ギターチューナー</h2>
 
       <div className="string-selector">
-        <label>
-          弦を選択：
-          <select
-            value={selectedString}
-            onChange={(e) => setSelectedString(Number(e.target.value))}
-            className="string-select"
-          >
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <option key={n} value={n}>
-                {n}弦 - {stringNotes[n].note}
-              </option>
-            ))}
-          </select>
-        </label>
+        {/* 上段 - 1弦から3弦 */}
+        <div className="string-row">
+          {[1, 2, 3].map((stringNum) => (
+            <div
+              key={stringNum}
+              className={`string-option ${selectedString === stringNum ? 'selected' : ''}`}
+              onClick={() => setSelectedString(stringNum)}
+            >
+              {stringNum}弦 - {stringNotes[stringNum].note}
+            </div>
+          ))}
+        </div>
+        
+        {/* 下段 - 4弦から6弦 */}
+        <div className="string-row">
+          {[4, 5, 6].map((stringNum) => (
+            <div
+              key={stringNum}
+              className={`string-option ${selectedString === stringNum ? 'selected' : ''}`}
+              onClick={() => setSelectedString(stringNum)}
+            >
+              {stringNum}弦 - {stringNotes[stringNum].note}
+            </div>
+          ))}
+        </div>
       </div>
 
       <canvas
         ref={canvasRef}
         width="300"
-        height="180"
+        height="200"
         className="tuner-canvas"
       />
 
       <div className="tuner-info">
-        <p>検出周波数: {frequency ? `${frequency} Hz` : "聴き取り中..."}</p>
-        <p>誤差：{frequency - stringNotes[selectedString].freq} Hz</p>
+        <p>
+          検出周波数: <span className="frequency-display">{frequency ? `${frequency} Hz` : "---"}</span>
+        </p>
+        <p>
+          誤差: <span className="frequency-display">{frequency ? `${diffRef.current.toFixed(1)} Hz` : "---"}</span>
+        </p>
+      </div>
+
+      <div className={`tuner-status ${tuningStatus}`}>
+        {getStatusText()}
+        <div>{getTuningDirection()}</div>
       </div>
     </div>
   )
