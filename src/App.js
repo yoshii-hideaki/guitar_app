@@ -9,7 +9,7 @@ import "./App.css"
 
 function Home() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+    <div className="home-container">
       <ChordDisplay />
       <Metronome />
     </div>
@@ -62,27 +62,8 @@ function App() {
           </Link>
         </div>
 
-        <div
-          style={{
-            backgroundColor: "#121212",
-            minHeight: "100vh",
-            padding: "40px 20px",
-            fontFamily: "'Helvetica Neue', Arial, sans-serif",
-            color: "#f5f5f5",
-            transition: "margin-left 0.3s ease",
-          }}
-        >
-          <h1
-            style={{
-              textAlign: "center",
-              fontSize: "36px",
-              fontWeight: "200",
-              letterSpacing: "3px",
-              marginBottom: "40px",
-              color: "#ffffff",
-              textTransform: "uppercase",
-            }}
-          >
+        <div className="app-container">
+          <h1 className="app-title">
             ギター練習アプリ
           </h1>
 

@@ -20,8 +20,8 @@ export default function ChordGallery() {
   )
 
   return (
-    <div style={{ marginTop: "40px" }}>
-      <h2 style={{ fontSize: "24px", marginBottom: "20px" }}>コード一覧</h2>
+    <div className="chord-gallery">
+      <h2 className="chord-gallery-title">コード一覧</h2>
 
       {/* 🔍 検索入力欄 */}
       <input
@@ -29,28 +29,16 @@ export default function ChordGallery() {
         placeholder="コードを検索..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        style={{
-          padding: "2px",
-          marginBottom: "20px",
-          borderRadius: "6px",
-          border: "1px solid #ccc",
-          width: "200px",
-        }}
+        className="chord-search"
       />
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+      <div className="chord-grid">
         {filteredChords.map((chord) => (
-          <div
-            key={chord.name}
-            style={{
-              width: "100px",
-              textAlign: "center",
-            }}
-          >
+          <div key={chord.name} className="chord-item">
             <img
               src={chord.image}
               alt={`${chord.name} chord`}
-              style={{ width: "100%", borderRadius: "8px" }}
+              className="chord-image"
             />
             <p>{chord.name}</p>
           </div>

@@ -60,152 +60,71 @@ function ChordDisplay() {
     setSelectedChords((prev) => (prev.includes(chord) ? prev.filter((c) => c !== chord) : [...prev, chord]))
   }
 
-  const containerStyle = {
-    textAlign: "center",
-    marginTop: "50px",
-    padding: "30px",
-    maxWidth: "600px",
-    margin: "0 auto",
-    backgroundColor: "#1a1a1a",
-    borderRadius: "8px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-    color: "#f5f5f5",
-  }
-
-  const chordDisplayStyle = {
-    fontSize: "72px",
-    fontWeight: "bold",
-    margin: "30px 0",
-    letterSpacing: "2px",
-    color: "#ffffff",
-    textShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
-  }
-
-  const nextChordStyle = {
-    fontSize: "32px",
-    opacity: "0.7",
-    marginBottom: "30px",
-    fontWeight: "300",
-  }
-
-  const buttonStyle = {
-    backgroundColor: "#333",
-    color: "white",
-    border: "none",
-    padding: "12px 24px",
-    borderRadius: "4px",
-    fontSize: "16px",
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-    margin: "10px 0",
-    fontWeight: "500",
-    letterSpacing: "1px",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-  }
-
-  const chordSelectorStyle = {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: "10px",
-    marginTop: "20px",
-  }
-
-  const chordLabelStyle = {
-    display: "inline-flex",
-    alignItems: "center",
-    backgroundColor: "#333",
-    padding: "8px 16px",
-    borderRadius: "4px",
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-  }
-
-  const titleStyle = {
-    fontSize: "24px",
-    fontWeight: "300",
-    letterSpacing: "1.5px",
-    marginBottom: "30px",
-    borderBottom: "1px solid #444",
-    paddingBottom: "10px",
-  }
-
-  const checkboxStyle = {
-    marginRight: "8px",
-    accentColor: "#666",
-  }
-
   return (
-    <div style={containerStyle}>
-      <h1 style={titleStyle}>ランダムギターコード</h1>
-      <div style={chordDisplayStyle}>{chord}</div>
-      <div style={nextChordStyle}>次: {nextChord}</div>
+    <div className="component-container chord-display">
+      <h1 className="component-title">ランダムギターコード</h1>
+      <div className="chord-text">{chord}</div>
+      <div className="next-chord">次: {nextChord}</div>
       <button
         onClick={() => setIsPlaying(!isPlaying)}
-        style={{
-          ...buttonStyle,
-          backgroundColor: isPlaying ? "#555" : "#333",
-        }}
+        className={`button ${isPlaying ? 'active' : ''}`}
       >
         {isPlaying ? "停止" : "自動更新"}
       </button>
 
       <h3 style={{ marginTop: "40px", fontWeight: "300" }}>使用するコード</h3>
-      <div style={chordSelectorStyle}>
+      <div className="chord-selector">
         {allChords.map((ch) => (
           <label
             key={ch}
-            style={{
-              ...chordLabelStyle,
-              backgroundColor: selectedChords.includes(ch) ? "#555" : "#333",
-            }}
+            className={`chord-label ${selectedChords.includes(ch) ? 'active' : ''}`}
           >
             <input
               type="checkbox"
               checked={selectedChords.includes(ch)}
               onChange={() => toggleChordSelection(ch)}
-              style={checkboxStyle}
+              className="checkbox"
             />
             {ch}
           </label>
         ))}
       </div>
       <div style={{ marginTop: "30px" }}>
-      <h3 style={{ fontWeight: "300", marginBottom: "10px" }}>コードの出し方</h3>
-      <label>
-        <input
-          type="radio"
-          name="mode"
-          value="random"
-          checked={mode === "random"}
-          onChange={() => setMode("random")}
-          style={checkboxStyle}
-        />
-        完全ランダム
-      </label>
-      <label style={{ marginLeft: "20px" }}>
-        <input
-          type="radio"
-          name="mode"
-          value="noRepeat"
-          checked={mode === "noRepeat"}
-          onChange={() => setMode("noRepeat")}
-          style={checkboxStyle}
-        />
-        前回と同じは避ける
-      </label>
-      <label style={{ marginLeft: "20px" }}>
-        <input
-          type="radio"
-          name="mode"
-          value="sequential"
-          checked={mode === "sequential"}
-          onChange={() => setMode("sequential")}
-          style={checkboxStyle}
-        />
-        順番に表示
-      </label>
-    </div>
+        <h3 style={{ fontWeight: "300", marginBottom: "10px" }}>コードの出し方</h3>
+        <label>
+          <input
+            type="radio"
+            name="mode"
+            value="random"
+            checked={mode === "random"}
+            onChange={() => setMode("random")}
+            className="checkbox"
+          />
+          完全ランダム
+        </label>
+        <label style={{ marginLeft: "20px" }}>
+          <input
+            type="radio"
+            name="mode"
+            value="noRepeat"
+            checked={mode === "noRepeat"}
+            onChange={() => setMode("noRepeat")}
+            className="checkbox"
+          />
+          前回と同じは避ける
+        </label>
+        <label style={{ marginLeft: "20px" }}>
+          <input
+            type="radio"
+            name="mode"
+            value="sequential"
+            checked={mode === "sequential"}
+            onChange={() => setMode("sequential")}
+            className="checkbox"
+          />
+          順番に表示
+        </label>
+      </div>
     </div>
   )
 }

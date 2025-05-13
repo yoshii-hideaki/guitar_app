@@ -92,17 +92,16 @@ function Tuner() {
   }
 
   return (
-    <div style={{ textAlign: "center", padding: "20px", color: "#fff", backgroundColor: "#111", minHeight: "100vh" }}>
-      <h2 style={{ marginBottom: "20px" }}>ギターチューナー</h2>
+    <div className="tuner-container">
+      <h2 className="tuner-title">ギターチューナー</h2>
 
-      {/* 弦選択 */}
-      <div style={{ marginBottom: "20px" }}>
+      <div className="string-selector">
         <label>
           弦を選択：
           <select
             value={selectedString}
             onChange={(e) => setSelectedString(Number(e.target.value))}
-            style={{ marginLeft: "10px", fontSize: "16px" }}
+            className="string-select"
           >
             {[1, 2, 3, 4, 5, 6].map((n) => (
               <option key={n} value={n}>
@@ -113,17 +112,17 @@ function Tuner() {
         </label>
       </div>
 
-      {/* キャンバス */}
       <canvas
         ref={canvasRef}
         width="300"
         height="180"
-        style={{ background: "#222", borderRadius: "8px", marginBottom: "20px" }}
+        className="tuner-canvas"
       />
 
-      {/* 情報表示 */}
-      <p>検出周波数: {frequency ? `${frequency} Hz` : "聴き取り中..."}</p>
-      <p>誤差：{frequency - stringNotes[selectedString].freq} Hz</p>
+      <div className="tuner-info">
+        <p>検出周波数: {frequency ? `${frequency} Hz` : "聴き取り中..."}</p>
+        <p>誤差：{frequency - stringNotes[selectedString].freq} Hz</p>
+      </div>
     </div>
   )
 }
